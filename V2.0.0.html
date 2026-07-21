@@ -59,21 +59,27 @@
 
 <p style="position:absolute;font-weight:bold;font-size:35px;margin-left:25px;margin-top:8px;">Seating Arrangement Simulation</p>
 <p style="position:absolute;margin-left:25px;margin-top:60px;">Choose 2 attendees to swap:</p>
-<p style="position:absolute;margin-left:25px;margin-top:130px;">Enter Number of Attendees, Tables, Table Capacity and RI to Reset:</p>
+<p style="position:absolute;margin-left:25px;margin-top:130px;">Reset number of attendees, tables, table capacity and RI:</p>
+<p style="position:absolute;margin-left:25px;margin-top:205px;">Alter seating weights:</p>
 <input id="i1" style="position:absolute;margin:0;left:30px;top:90px;">
 <input id="i2" style="position:absolute;margin:0;left:225px;top:90px;">
 <input id="i3" style="position:absolute;margin:0;left:30px;top:160px;">
 <input id="i4" style="position:absolute;margin:0;left:225px;top:160px;">
 <input id="i5" style="position:absolute;margin:0;left:420px;top:160px;">
 <input id="i6" style="position:absolute;margin:0;left:615px;top:160px;">
+<input id="i7" style="position:absolute;margin:0;left:30px;top:240px;">
+<input id="i8" style="position:absolute;margin:0;left:225px;top:240px;">
 <button id="b1" style="position:absolute;margin:0;left:420px;top:90px;"></button>
 <button id="b2" style="position:absolute;margin:0;left:810px;top:160px;"></button>
-<p id="SS" style="position:absolute;margin:0;margin-left:25px;margin-top:205px;">SS=0</p>
-<p id="CP" style="position:absolute;margin:0;margin-left:220px;margin-top:205px;">CP=0</p>
-<p id="RI" style="position:absolute;margin:0;margin-left:25px;margin-top:240px;">RI:</p>
-<p id="NOTE" style="position:absolute;margin:0;left:35px;top:47px;font-size:17px;">Reminder: Please do not enter too large input or there may be a bug.We fix Seating Weights as 20,11,0.</p>
+<button id="b3" style="position:absolute;margin:0;left:420px;top:240px;"></button>
+<p id="SS" style="position:absolute;margin:0;margin-left:25px;margin-top:280px;">SS = 0</p>
+<p id="CP" style="position:absolute;margin:0;margin-left:220px;margin-top:280px;">CP = 0</p>
+<p id="WN" style="position:absolute;margin:0;margin-left:420px;margin-top:280px;">Wn=</p>
+<p id="WC" style="position:absolute;margin:0;margin-left:615px;margin-top:280px;">Wc=</p>
+<p id="RI" style="position:absolute;margin:0;margin-left:25px;margin-top:315px;"></p>
+<p id="NOTE" style="position:absolute;margin:0;left:33px;top:46px;font-size:17px;">Reminder: Please do not enter too large input or there may be a bug.</p>
 <script>
-  let n=0,m=0,c=0,butt,reset,ml,il,Ml,Il,x,y,z,w,tp1,tp2,tp3,tp4,tp5,tp6,ss=0,cp=0,tps,tpcp,wn=20,wc=11,wa=0,Ss,Cp,Ri,text1,text2,ctop=265,leftoffset=0,tpn,tpm,tpc,RII;
+  let n=0,m=0,c=0,butt,reset,alter,ml,il,Ml,Il,x,y,z,w,tp1,tp2,tp3,tp4,tp5,tp6,ss=0,cp=0,tps,tpcp,wn=20,wc=11,wa=0,Ss,Cp,Ri,text1,text2,ctop=345,leftoffset=0,tpn,tpm,tpc,RII,Wn,Wc,tpwn,tpwc;
   let r=Array.from({length:1010},()=>Array(1010).fill(0));
   let R=Array.from({length:1010},()=>Array(1010).fill(0));
   let a=Array.from({length:1010},()=>Array(1010).fill(0));
@@ -90,10 +96,16 @@
   Cp=document.getElementById("CP");
   butt=document.getElementById("b1");
   reset=document.getElementById("b2");
+  alter=document.getElementById("b3");
   Ml=document.getElementById("i1");
   Il=document.getElementById("i2");
+  Wn=document.getElementById("WN");
+  Wc=document.getElementById("WC");
   butt.innerText="Swap";
   reset.innerText="Reset";
+  alter.innerText="Alter";
+  Wn.innerText="Wn = "+wn;
+  Wc.innerText="Wc = "+wc;
  
   reset.onclick=function(){
     tpn=Number(document.getElementById("i3").value);
@@ -133,10 +145,11 @@
     document.querySelectorAll(".chair").forEach(t=>t.remove());
     document.querySelectorAll(".table").forEach(t=>t.remove());
     document.querySelectorAll(".block").forEach(t=>t.remove());
-    ctop=265,leftoffset=0;
+    ctop=345,leftoffset=0;
     for(let i=1;i<=n;i++){
     for(let j=1;j<=n;j++){
       r[i][j]=tpr[(i-1)*n+j];
+/*
       R[i][j]=document.createElement("div");
       R[i][j].className="block";
       R[i][j].id="b"+i+","+j;
@@ -146,10 +159,11 @@
       R[i][j].style.top=ctop+"px";
       R[i][j].style.fontSize=20+"px";
       document.body.appendChild(R[i][j]);
+*/
     }
-    ctop+=30;
+    //ctop+=30;
    }
-   ctop+=70;
+   ctop+=40;
    for(let i=1;i<=m;i++){
     T[i]=document.createElement("div");
     T[i].className="table";
@@ -193,9 +207,26 @@
     C[z][w].innerText=a[z][w]<=n?a[z][w]:(a[z][w]+"*");
 
     cal();
-  ss=tps,cp=tpcp;
-    Ss.innerText="SS="+ss;
-   Cp.innerText="CP="+cp;
+    ss=tps,cp=tpcp;
+    Ss.innerText="SS = "+ss;
+    Cp.innerText="CP = "+cp;
+  }
+  
+  alter.onclick=function(){
+    tpwn=Number(document.getElementById("i7").value);
+    tpwc=Number(document.getElementById("i8").value);
+    if(tpwn<=tpwc||tpwc<=0){
+      alert("Invalid Input!(Seating weight out of range)");
+      return;
+    }
+    wn=tpwn;
+    wc=tpwc;
+    cal();
+    ss=tps,cp=tpcp;
+    Ss.innerText="SS = "+ss;
+    Cp.innerText="CP = "+cp;
+    Wn.innerText="Wn = "+wn;
+    Wc.innerText="Wc = "+wc;
   }
   
   function cal(){
@@ -249,8 +280,8 @@
   }
   cal();
   ss=tps,cp=tpcp;
-  Ss.innerText="SS="+ss;
-  Cp.innerText="CP="+cp;
+  Ss.innerText="SS = "+ss;
+  Cp.innerText="CP = "+cp;	
   Ml.value="";
   Il.value=""; 
   }
