@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+  <style>
+    *{
+ 	  font-family:"Times New Roman",serif;
+      font-size:25px;	
+      line-height:0.1;
+ 	 }
+    .chair{
+      width:40px;
+      height:40px;
+      background:#FFDD44;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+    .block{
+      width:50px;
+      height:30px;
+      background:#FFFFFF;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .Block{
+      width:500px;
+      height:30px;
+      background:#FFFFFF;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .table{
+      width:200px;
+      height:200px;
+      border-radius:50%;
+      background:#5A89D9;
+      display:flex;
+	  align-items:center;
+   	  justify-content:center;
+      font-size:25px;
+    }
+    button{
+      width:75px;
+      height:33px;
+    }
+    input{
+     width:175px;
+     height:26px;
+    }
+  </style>
+
+<title>文档标题</title>
+</head>
+<body>
+
+<p style="position:absolute;font-weight:bold;font-size:35px;margin-left:25px;margin-top:8px;">Seating Arrangement Simulation</p>
+<p style="position:absolute;margin-left:25px;margin-top:65px;">Fill the next seat:</p>
+<p style="position:absolute;margin-left:25px;margin-top:100px;">Reset number of attendees, tables, table capacity and RI:</p>
+<p style="position:absolute;margin-left:25px;margin-top:170px;">Alter seating weights:</p>
+<input id="i3" style="position:absolute;margin:0;left:30px;top:130px;">
+<input id="i4" style="position:absolute;margin:0;left:225px;top:130px;">
+<input id="i5" style="position:absolute;margin:0;left:420px;top:130px;">
+<input id="i6" style="position:absolute;margin:0;left:615px;top:130px;">
+<input id="i7" style="position:absolute;margin:0;left:30px;top:200px;">
+<input id="i8" style="position:absolute;margin:0;left:225px;top:200px;">
+<button id="b1" style="position:absolute;margin:0;left:420px;top:60px;"></button>
+<button id="b2" style="position:absolute;margin:0;left:810px;top:130px;"></button>
+<button id="b3" style="position:absolute;margin:0;left:420px;top:200px;"></button>
+<p id="SS" style="position:absolute;margin:0;margin-left:25px;margin-top:240px;">SS = 0</p>
+<p id="CP" style="position:absolute;margin:0;margin-left:220px;margin-top:240px;">CP = 0</p>
+<p id="WN" style="position:absolute;margin:0;margin-left:420px;margin-top:240px;">Wn=</p>
+<p id="WC" style="position:absolute;margin:0;margin-left:615px;margin-top:240px;">Wc=</p>
+<p id="RI" style="position:absolute;margin:0;margin-left:25px;margin-top:275px;"></p>
+
+<p id="NOTE" style="position:absolute;margin:0;left:33px;top:46px;font-size:17px;">Reminder: Please do not enter too large input or there may be a bug.</p>
+<script>
+  let n=0,m=0,c=0,butt,reset,alter,ml,il,Ml,Il,x,y,z,w,tp1,tp2,tp3,tp4,tp5,tp6,ss=0,cp=0,tps,tpcp,wn=20,wc=11,wa=0,Ss,Cp,Ri,text1,text2,ctop=310,leftoffset=0,tpn,tpm,tpc,RII,Wn,Wc,tpwn,tpwc,CW,CPI,ccp,css,ci,maxi,op,round;
+  let r=Array.from({length:1010},()=>Array(1010).fill(0));
+  let R=Array.from({length:1010},()=>Array(1010).fill(0));
+  let a=Array.from({length:1010},()=>Array(1010).fill(0));
+  let cppair=Array.from({length:1000010},()=>Array(2).fill(0));
+  let CPLIST=Array.from({length:1000010},()=>Array(2).fill(0));
+  let C=Array.from({length:1010},()=>Array(1010).fill(0)); //chair body
+  let T=new Array(1010); //table body
+  let p=new Array(1010); //how many conflicts
+  let P=new Array(1010); 
+  let CPP=new Array(1010); 
+  let CPS=new Array(1010); 
+  let q=new Array(1010); //each SS
+  let tpr=new Array(1000010);
+  let b=new Array(1000010);
+  let B=new Array(1000010);
+  let v=new Array(1010); //whether visited
+  Ss=document.getElementById("SS");
+  Cp=document.getElementById("CP");
+  butt=document.getElementById("b1");
+  reset=document.getElementById("b2");
+  alter=document.getElementById("b3");
+  Wn=document.getElementById("WN");
+  Wc=document.getElementById("WC");
+  butt.innerText="Fill";
+  reset.innerText="Reset";
+  alter.innerText="Alter";
+  Wn.innerText="Wn = "+wn;
+  Wc.innerText="Wc = "+wc;
+ 
+  reset.onclick=function(){
+    tpn=Number(document.getElementById("i3").value);
+    tpm=Number(document.getElementById("i4").value);
+    tpc=Number(document.getElementById("i5").value);
+    if(tpn<=0||tpm<=0||tpc<=0){
+      alert("Invalid Input!(Number of attendees, tables or table capacity is not positive)");
+   	  return;
+    }
+    if(tpn>tpm*tpc){
+      alert("Invalid Input!(Too many attendees, overseated)");
+   	  return;
+    }
+    RII=document.getElementById("i6").value.trim();
+    let ip=1,nega=1;tpr[1]=0,badpoint=1;
+    for(let j of RII){
+      if(j==" "){
+        if(badpoint==0) continue; 
+        tpr[ip]*=nega,++ip,nega=1,tpr[ip]=0,badpoint=0;
+      }
+      else if(j=="-") nega=-1,badpoint=1;
+      else if(!isNaN(Number(j))) tpr[ip]=tpr[ip]*10+Number(j),badpoint=1;
+      else{
+        alert("Invalid Input!(RI input not Numbers)");
+        return;
+      }
+    }
+    tpr[ip]*=nega;++ip;
+    if(ip<=tpn*tpn){
+     while(ip<=tpn*tpn) tpr[ip]=0,++ip; 
+   }
+    else if(ip>tpn*tpn+1){
+      alert("Invalid Input!(To many RI values)");
+      return;
+    }
+    n=tpn,m=tpm,c=tpc;
+    document.querySelectorAll(".chair").forEach(t=>t.remove());
+    document.querySelectorAll(".table").forEach(t=>t.remove());
+    document.querySelectorAll(".block").forEach(t=>t.remove());
+    document.querySelectorAll(".Block").forEach(t=>t.remove());
+    ctop=315,leftoffset=0;
+    
+    for(let i=1;i<=n;i++){
+    for(let j=1;j<=n;j++){
+      r[i][j]=tpr[(i-1)*n+j];
+      /*
+      R[i][j]=document.createElement("div");
+      R[i][j].className="block";
+      R[i][j].id="b"+i+","+j;
+      R[i][j].innerText=r[i][j];
+      R[i][j].style.position="absolute";
+      R[i][j].style.left=25+(j-1)*50+"px";
+      R[i][j].style.top=ctop+"px";
+      R[i][j].style.fontSize=20+"px";
+      document.body.appendChild(R[i][j]);
+      */
+    }
+    //ctop+=30;
+   }
+   //ctop+=80;
+   
+   for(let i=1;i<=m;i++){
+    T[i]=document.createElement("div");
+    T[i].className="table";
+    T[i].id="t"+i;
+    T[i].style.position="absolute";
+    T[i].style.left=105+leftoffset+"px";
+    T[i].style.top=ctop+"px";
+    T[i].style.backgroundColor="#5A89D9";   
+    for(let j=1;j<=c;j++){
+      C[i][j]=document.createElement("div");
+      C[i][j].className="chair";
+      C[i][j].id="c"+i+","+j;
+      C[i][j].style.position="absolute";
+      C[i][j].style.left=185+leftoffset-130*Math.cos(2*Math.PI*j/c)+"px";
+      C[i][j].style.top=ctop+80-130*Math.sin(2*Math.PI*j/c)+"px";
+      C[i][j].style.backgroundColor="#FFDD44";
+      document.body.appendChild(C[i][j]);
+    }
+    if(i%4==0) ctop+=350,leftoffset=0;
+    else leftoffset+=350;
+    document.body.appendChild(T[i]);
+   }
+    ctop+=250;
+    ini();
+    CW=document.createElement("div");
+    CW.className="Block";
+    CW.id="CW";
+    CW.innerText="Conflict with how many unseated attendees:";
+    CW.style.position="absolute";
+    CW.style.left=15+"px";
+    CW.style.top=ctop+"px";
+    document.body.appendChild(CW);
+    maxi=-1,op=0;
+    ctop+=30;
+    for(let i=1;i<=m*c;i++){
+      P[i]=document.createElement("div");
+      P[i].className="block";
+  	  P[i].id="P"+i;
+   	  P[i].innerText=p[i];
+      if(p[i]>maxi) maxi=p[i],op=i;
+   	  P[i].style.position="absolute";
+   	  P[i].style.left=25+(i-1)*50+"px";
+   	  P[i].style.top=ctop+"px";
+      P[i].style.fontSize=20+"px";
+      document.body.appendChild(P[i]);
+    }
+    P[op].style.color="#FF0000";
+    
+    ccp=1010,css=-1,ci=0;
+    CPI=document.createElement("div");
+    CPI.className="Block";
+    CPI.id="CPI";
+    CPI.innerText="How much CP&SS if put at the next seat:";
+    CPI.style.position="absolute";
+    CPI.style.left=10+"px";
+    CPI.style.top=ctop+40+"px";
+    document.body.appendChild(CPI);
+   	for(let i=1;i<=m*c;i++){
+      CPP[i]=document.createElement("div");
+      CPS[i]=document.createElement("div");
+      CPP[i].className="block";
+      CPS[i].className="block";
+  	  CPP[i].id="CPP"+i;
+      CPS[i].id="CPS"+i;
+      a[1][1]=i;
+      cal();
+      CPP[i].innerText=tpcp;
+      CPS[i].innerText=tps;
+      if(tpcp<ccp||(tpcp==ccp&&tps>css)) ccp=tpcp,css=tps,ci=i;
+   	  CPP[i].style.position="absolute";
+      CPS[i].style.position="absolute";
+   	  CPP[i].style.left=25+(i-1)*50+"px";
+      CPS[i].style.left=25+(i-1)*50+"px";
+   	  CPP[i].style.top=ctop+70+"px";
+      CPS[i].style.top=ctop+100+"px";
+      CPP[i].style.fontSize=20+"px";
+      CPS[i].style.fontSize=20+"px";
+      document.body.appendChild(CPP[i]);
+      document.body.appendChild(CPS[i]);
+    }
+    CPP[ci].style.color="#0000FF";
+    CPS[ci].style.color="#0000FF";
+  }
+  
+  
+  
+  butt.onclick=function(){
+    if(round>=m*c) {
+      alert("All attendees already seated!");
+      return;
+    }
+    ++round;
+    if(round%c==1){
+      C[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1].innerText=op;
+      a[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1]=op;
+      v[op]=1;
+      cal();
+      for(let i=1;i<=n;i++){
+        if(r[i][op]<0) --p[i];
+      }
+      ss=tps,cp=tpcp;
+      Ss.innerText="SS = "+ss;
+      Cp.innerText="CP = "+cp;	
+    }
+    else{
+      C[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1].innerText=ci;
+      a[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1]=ci;
+      v[ci]=1;
+      cal();
+      for(let i=1;i<=n;i++){
+        if(r[i][ci]<0) --p[i];
+      }
+      ss=tps,cp=tpcp;
+      Ss.innerText="SS = "+ss;
+      Cp.innerText="CP = "+cp;	
+    }
+    
+    maxi=-1,op=0;
+    for(let i=1;i<=m*c;i++){
+      P[i].style.color="#000000";
+      if(v[i]==1) {
+        P[i].innerText="/";
+        continue;
+      }
+      if(p[i]>maxi) maxi=p[i],op=i;
+   	  P[i].innerText=p[i];
+    }
+    P[op].style.color="#FF0000";
+    
+    ccp=1010,css=-1,ci=0;
+    for(let i=1;i<=m*c;i++){
+      CPP[i].style.color="#000000";
+      CPS[i].style.color="#000000";
+      if(v[i]==1){
+        CPP[i].innerText="/";
+        CPS[i].innerText="/";
+        continue;
+      }
+      a[Math.floor((round)/c)+1][Math.floor((round)%c)+1]=i;
+      cal();
+      CPP[i].innerText=tpcp;
+      CPS[i].innerText=tps;
+      if(tpcp<ccp||(tpcp==ccp&&tps>css)) ccp=tpcp,css=tps,ci=i;
+   	  
+    }
+    CPP[ci].style.color="#0000FF";
+    CPS[ci].style.color="#0000FF";
+  }
+  
+  alter.onclick=function(){
+    tpwn=Number(document.getElementById("i7").value);
+    tpwc=Number(document.getElementById("i8").value);
+    if(tpwn<=tpwc||tpwc<=0){
+      alert("Invalid Input!(Seating weight out of range)");
+      return;
+    }
+    wn=tpwn;
+    wc=tpwc;
+    cal();
+    ss=tps,cp=tpcp;
+    Ss.innerText="SS = "+ss;
+    Cp.innerText="CP = "+cp;
+    Wn.innerText="Wn = "+wn;
+    Wc.innerText="Wc = "+wc;
+  }
+  
+  function cal(){
+    tps=0,tpcp=0;
+	for(let i=1;i<=m;i++){
+		for(let j=1;j<=c;j++){
+			for(let k=j+1;k<=c;k++){
+				if(r[a[i][j]][a[i][k]]<0) ++tpcp;
+				else if((k-j+c-1)%c==0||(k-j+1)%c==0) tps+=wn*r[a[i][j]][a[i][k]];
+				else tps+=wc*r[a[i][j]][a[i][k]];
+			}
+		}
+	}
+  }
+  function ini(){
+    round=0;
+    for(let i=1;i<=m;i++){
+      b[i]=i;
+      T[i].innerText="Table"+b[i];
+      for(let j=1;j<=c;j++){
+        a[i][j]=0;
+      }
+  }
+  for(let i=1;i<=m*c;i++){	
+    p[i]=0;v[i]=0;
+  }
+  for(let i=1;i<=n;i++){
+    for(let j=i+1;j<=n;j++){
+      if(r[i][j]<0) ++p[i],++p[j];
+    }
+  }
+  ss=0,cp=0;
+  Ss.innerText="SS = "+ss;
+  Cp.innerText="CP = "+cp;	
+
+  }
+</script>
+</body>
+</html>
