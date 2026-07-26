@@ -174,7 +174,7 @@
     T[i].id="t"+i;
     T[i].style.position="absolute";
     T[i].style.left=105+leftoffset+"px";
-    T[i].style.top=ctop+"px";
+    T[i].style.top=ctop+260+"px";
     T[i].style.backgroundColor="#5A89D9";   
     for(let j=1;j<=c;j++){
       C[i][j]=document.createElement("div");
@@ -182,7 +182,7 @@
       C[i][j].id="c"+i+","+j;
       C[i][j].style.position="absolute";
       C[i][j].style.left=185+leftoffset-130*Math.cos(2*Math.PI*j/c)+"px";
-      C[i][j].style.top=ctop+80-130*Math.sin(2*Math.PI*j/c)+"px";
+      C[i][j].style.top=ctop+340-130*Math.sin(2*Math.PI*j/c)+"px";
       C[i][j].style.backgroundColor="#FFDD44";
       document.body.appendChild(C[i][j]);
     }
@@ -190,7 +190,7 @@
     else leftoffset+=350;
     document.body.appendChild(T[i]);
    }
-    ctop+=250;
+	ctop=315;
     ini();
     CW=document.createElement("div");
     CW.className="Block";
@@ -222,7 +222,7 @@
     CPI.id="CPI";
     CPI.innerText="How much CP&SS if put at the next seat:";
     CPI.style.position="absolute";
-    CPI.style.left=10+"px";
+    CPI.style.left=0+"px";
     CPI.style.top=ctop+40+"px";
     document.body.appendChild(CPI);
    	for(let i=1;i<=m*c;i++){
