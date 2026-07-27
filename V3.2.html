@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+  <style>
+    *{
+ 	  font-family:"King's Gambit",serif;
+      font-size:25px;	
+      line-height:0.1;
+      margin:0;
+ 	 }
+    .arcaea-title{
+      background:#6B5794;
+      color:transparent;
+      font-size:45px;
+      height:45px;
+      -webkit-background-clip: text;
+      -webkit-text-stroke: 1.3px #6B5794;
+    }
+    .chair{
+      width:40px;
+      height:40px;
+      background:#FFDD44;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+    .block{
+      width:60px;
+      height:30px;
+      background:transparent;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .Block{
+      width:500px;
+      height:30px;
+      background:transparent;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .table{
+      width:200px;
+      height:200px;
+      border-radius:50%;
+      background:#5A89D9;
+      display:flex;
+	  align-items:center;
+   	  justify-content:center;
+      font-size:25px;
+    }
+    button{
+      width:140px;
+      height:26px;
+
+      border: none;    
+      background:linear-gradient(to right,
+    #463469 0%,
+    #463469 10%,
+    transparent 15%,
+    transparent 85%,
+    #463469 90%,
+    #463469 100%)
+    }
+    button1{
+      width:600px;
+      height:26px;
+      border: none;    
+      background:transparent;
+    }
+    input{
+     width:140px;
+     height:26px;
+     background: linear-gradient(to right,
+    #463469 0%,
+    #463469 15%,
+    transparent 20%,
+    transparent 80%,
+    #463469 85%,
+    #463469 100%
+  );
+      text-indent:20%;
+
+
+    }
+  </style>
+
+<title>文档标题</title>
+</head>
+<body>
+
+<script>
+  let n=8,m=2,c=4,butt,reset,alter,ml,il,Ml,Il,x,y,z,w,tp1,tp2,tp3,tp4,tp5,tp6,ss=0,cp=0,tps,tpcp,wn=20,wc=11,wa=0,Ss,Cp,Ri,text1,text2,ctop=310,leftoffset=0,tpn,tpm,tpc,RII="0 -1 5 5 12 15 19 11 -1 0 8 2 11 13 21 9 5 8 0 23 17 5 7 -1 5 2 23 0 10 16 -1 6 12 11 17 10 0 13 4 -1 15 13 5 16 13 0 0 18 19 21 7 -1 4 0 0 21 11 9 -1 6 -1 18 21 0",
+  Wn,Wc,tpwn,tpwc,CW,CPI,ccp,css,ci,maxi,op,round,ctop1=50,ctop2=50;
+  let r=Array.from({length:1010},()=>Array(1010).fill(0));
+  let R=Array.from({length:1010},()=>Array(1010).fill(0));
+  let a=Array.from({length:1010},()=>Array(1010).fill(0));
+  let C=Array.from({length:1010},()=>Array(1010).fill(0)); //chair body
+  let T=new Array(1010); //table body
+  let p=new Array(1010); //how many conflicts
+  let P=new Array(1010); 
+  let CPP=new Array(1010); 
+  let CPS=new Array(1010); 
+  let tpr=new Array(1000010);
+  let v=new Array(1010); //whether visited
+  
+  function CreateEntity(className,innerText,left,top,fontSize,justifyContent,id){
+    let el=document.createElement("div");
+    el.className=className;
+    el.innerText=innerText;
+    el.style.color="#6B5794";
+    el.style.position="absolute";
+    el.style.left=left+"px";
+    el.style.top=top+"px";
+    if(fontSize) el.style.fontSize=fontSize+"px";
+    if(!justifyContent) el.style.justifyContent="flex-start";
+    else el.style.justifyContent=justifyContent;
+    if(id) el.id=id;
+    return el;
+    }
+  
+  function CreateInput(innerText,left,top,fontSize,id){
+    let el=document.createElement("input");
+    el.value=innerText;
+    el.style.color="#000000";
+    el.style.position="absolute";
+    el.style.left=left+"px";
+    el.style.top=top+"px";
+    if(fontSize) el.style.fontSize=fontSize+"px";
+    if(id) el.id=id;
+    return el;
+    }
+  
+  function CreateButton(innerText,left,top,fontSize,id){
+    let el=document.createElement("button");
+    el.innerText=innerText;
+    el.style.color="#6B5794";
+    el.style.position="absolute";
+    el.style.left=left+"px";
+    el.style.top=top+"px";
+    if(fontSize) el.style.fontSize=fontSize+"px";
+    if(id) el.id=id;
+    return el;
+    }
+  
+  function CreateButton1(innerText,left,top,fontSize,id){
+    let el=document.createElement("button1");
+    el.innerText=innerText;
+    el.style.color="#6B5794";
+    el.style.position="absolute";
+    el.style.left=left+"px";
+    el.style.top=top+"px";
+    if(fontSize) el.style.fontSize=fontSize+"px";
+    if(id) el.id=id;
+    return el;
+    }
+  
+  let 
+  SeatingArrangementSimulation=CreateEntity("Block","Seating Arrangement Simulation",25,ctop1,30,"flex-start")
+  FillTheNextSeat=CreateEntity("Block","Fill the next seat:",25,ctop1+40,25,"flex-start"),
+  ResetSetting=CreateEntity("Block","Setting",225,ctop2+70,30,"flex-start"),
+  ResetN=CreateEntity("Block","Number of Attendees:",25,ctop2+120,25,"flex-start"),
+  ResetM=CreateEntity("Block","Number of Tables:",25,ctop2+160,25,"flex-start"),
+  ResetC=CreateEntity("Block","Table Capacity:",25,ctop2+200,25,"flex-start"),
+  ResetRI=CreateEntity("Block","Relationship Index:",25,ctop2+240,25,"flex-start"),
+  ResetWn=CreateEntity("Block","Weight of Neighbour State:",25,ctop2+280,25,"flex-start"),
+  ResetWc=CreateEntity("Block","Weight of Community State:",25,ctop2+320,25,"flex-start"),
+  getN=CreateInput(0,395,ctop2+120,25,"i3"),
+  getM=CreateInput(0,395,ctop2+160,25,"i4"),
+  getC=CreateInput(0,395,ctop2+200,25,"i5"),
+  getRI=CreateInput(0,395,ctop2+240,25,"i6"),
+  getWn=CreateInput(0,395,ctop2+280,25,"i7"),
+  getWc=CreateInput(0,395,ctop2+320,25,"i8"),
+  startresetpage=CreateButton("Setting",0,0,25,"b1"),
+  resetConfirm=CreateButton("Confirm",195,ctop2+380,25,"b2"),
+  fill=CreateButton("Fill",0,35,25,"b3"),
+  prev=CreateButton("Prev",0,70,25,"b4"),
+  SS=CreateEntity("Block","SS = "+ss,170,0,20,"flex-start"),
+  CP=CreateEntity("Block","CP = "+cp,290,0,20,"flex-start"),
+  WN=CreateEntity("Block","WN = "+wn,410,0,20,"flex-start"),
+  WC=CreateEntity("Block","WC = "+wc,530,0,20,"flex-start")
+   ;
+  let SeatingArrangement=CreateEntity("Block","Seating Arrangement",530,400,45,"center");
+  let Simulation=CreateEntity("Block","Simulation",530,460,35,"center");
+  let taptostart=CreateButton1("———Tap to Start———",665,520,20);
+  document.body.appendChild(taptostart);
+  document.body.appendChild(SeatingArrangement);
+  document.body.appendChild(Simulation);
+  
+  taptostart.onclick=function(){
+    taptostart.remove();
+    SeatingArrangement.remove();
+    Simulation.remove();
+  document.body.appendChild(SS);
+  document.body.appendChild(CP);
+  document.body.appendChild(WN);
+  document.body.appendChild(WC);
+  document.body.appendChild(startresetpage);
+  document.body.appendChild(fill);
+  document.body.appendChild(prev);
+  }
+  
+  startresetpage.onclick=function(){
+    document.querySelectorAll(".chair").forEach(t=>t.remove());
+    document.querySelectorAll(".table").forEach(t=>t.remove());
+    document.querySelectorAll(".block").forEach(t=>t.remove());
+    if(CW)CW.remove();
+    if(CPI)CPI.remove();
+    fill.remove();
+    prev.remove();
+    
+  document.body.appendChild(ResetSetting);
+  document.body.appendChild(ResetN);
+  document.body.appendChild(ResetM);
+  document.body.appendChild(ResetC);
+  document.body.appendChild(ResetRI);
+  document.body.appendChild(ResetWn);
+  document.body.appendChild(ResetWc);
+  document.body.appendChild(getN);
+  document.body.appendChild(getM);
+  document.body.appendChild(getC);
+  document.body.appendChild(getRI);
+  document.body.appendChild(getWn);
+  document.body.appendChild(getWc);
+  getN.value=n;getM.value=m;getC.value=c;
+  getWn.value=wn;getWc.value=wc;getRI.value=RII;
+  document.body.appendChild(resetConfirm);
+  }
+  
+  function show1(){
+    SS.innerText="SS = "+ss;
+    CP.innerText="CP = "+cp;
+    WN.innerText="WN = "+wn;
+    WC.innerText="WC = "+wc;
+  }
+  
+  resetConfirm.onclick=function(){
+    tpn=Number(document.getElementById("i3").value);
+    tpm=Number(document.getElementById("i4").value);
+    tpc=Number(document.getElementById("i5").value);
+    if(tpn<=0||tpm<=0||tpc<=0){
+      alert("Invalid Input!(Number of attendees, tables or table capacity is not positive)");
+   	  return;
+    }
+    if(tpn>tpm*tpc){
+      alert("Invalid Input!(Too many attendees, overseated)");
+   	  return;
+    }
+    RII=document.getElementById("i6").value.trim();
+    let ip=1,nega=1;tpr[1]=0,badpoint=1;
+    for(let j of RII){
+      if(j==" "){
+        if(badpoint==0) continue; 
+        tpr[ip]*=nega,++ip,nega=1,tpr[ip]=0,badpoint=0;
+      }
+      else if(j=="-") nega=-1,badpoint=1;
+      else if(!isNaN(Number(j))) tpr[ip]=tpr[ip]*10+Number(j),badpoint=1;
+      else{
+        alert("Invalid Input!(RI input not Numbers)");
+        return;
+      }
+    }
+    tpr[ip]*=nega;++ip;
+    if(ip<=tpn*tpn){
+     while(ip<=tpn*tpn) tpr[ip]=0,++ip; 
+   }
+    else if(ip>tpn*tpn+1){
+      alert("Invalid Input!(To many RI values)");
+      return;
+    }
+    tpwn=Number(document.getElementById("i7").value);
+    tpwc=Number(document.getElementById("i8").value);
+    if(tpwn<=tpwc||tpwc<=0){
+      alert("Invalid Input!(Seating weight out of range)");
+      return;
+    }
+    n=tpn,m=tpm,c=tpc;
+    wn=tpwn;
+    wc=tpwc;
+    document.body.appendChild(fill);
+    document.body.appendChild(prev);
+    
+    for(let i=1;i<=m*c;i++){for(let j=1;j<=m*c;j++){r[i][j]=0;}}
+    for(let i=1;i<=n;i++){for(let j=1;j<=n;j++){r[i][j]=tpr[(i-1)*n+j];}}
+    for(let i=1;i<=m;i++){for(let j=1;j<=c;j++){a[i][j]=0;}}
+    for(let i=1;i<=m*c;i++){p[i]=0;v[i]=0;}
+    for(let i=1;i<=n;i++){for(let j=i+1;j<=n;j++){if(r[i][j]<0) ++p[i],++p[j];}}
+    round=0;
+    
+    document.querySelectorAll(".chair").forEach(t=>t.remove());
+    document.querySelectorAll(".table").forEach(t=>t.remove());
+    document.querySelectorAll(".block").forEach(t=>t.remove());
+    show1();
+    
+    ResetSetting.remove();
+    ResetN.remove();
+    ResetM.remove();
+    ResetC.remove();
+    ResetRI.remove();
+    ResetWn.remove();
+    ResetWc.remove();
+    getN.remove();
+    getM.remove();
+    getC.remove();
+    getRI.remove();
+    getWn.remove();
+    getWc.remove();
+    resetConfirm.remove();
+    
+	ctop=120,leftoffset=0;
+    CW=CreateEntity("Block","Conflict with how many unseated attendees:",10,ctop,20,"flex-start","CW");
+    CPI=CreateEntity("Block","How much CP&SS if put at the next seat:",10,ctop+60,20,"flex-start","CPI");
+    document.body.appendChild(CW);
+    document.body.appendChild(CPI);
+    
+    maxi=-1,op=0;
+    for(let i=1;i<=m*c;i++){
+      P[i]=CreateEntity("block",p[i],25+(i-1)*60,ctop+30,20,"center");
+      P[i].style.color="#000000";
+      if(p[i]>maxi) maxi=p[i],op=i;
+      document.body.appendChild(P[i]);
+    }
+    P[op].style.color="#FF0000";
+    
+    ccp=1010,css=-1,ci=0;
+    
+   	for(let i=1;i<=m*c;i++){
+      CPP[i]=CreateEntity("block",0,25+(i-1)*60,ctop+90,20,"center");
+ 	  CPS[i]=CreateEntity("block",0,25+(i-1)*60,ctop+115,20,"center");
+      CPP[i].style.color="#000000";
+      CPS[i].style.color="#000000";
+      document.body.appendChild(CPP[i]);
+      document.body.appendChild(CPS[i]);
+      ci=1;
+    }
+    CPP[ci].style.color="#0000FF";
+    CPS[ci].style.color="#0000FF";
+    
+    for(let i=1;i<=m;i++){
+    T[i]=document.createElement("div");
+    T[i].className="table";
+    T[i].innerText="Table"+i;
+    T[i].id="t"+i;
+    T[i].style.position="absolute";
+    T[i].style.left=80+leftoffset+"px";
+    T[i].style.top=ctop+230+"px";
+    T[i].style.backgroundColor="#5A89D9";   
+    for(let j=1;j<=c;j++){
+      C[i][j]=document.createElement("div");
+      C[i][j].className="chair";
+      C[i][j].id="c"+i+","+j;
+      C[i][j].style.position="absolute";
+      C[i][j].style.left=160+leftoffset-130*Math.cos(2*Math.PI*j/c)+"px";
+      C[i][j].style.top=ctop+310-130*Math.sin(2*Math.PI*j/c)+"px";
+      C[i][j].style.backgroundColor="#FFDD44";
+      document.body.appendChild(C[i][j]);
+    }
+    leftoffset+=350;
+    document.body.appendChild(T[i]);
+   }
+  }
+ 
+  
+  fill.onclick=function(){
+    if(round>=m*c) {
+      alert("All attendees already seated!");
+      return;
+    }
+    ++round;
+    if(round%c==1){
+      C[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1].innerText=op;
+      a[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1]=op;
+      v[op]=1;
+      cal();
+      for(let i=1;i<=n;i++){
+        if(r[i][op]<0) --p[i];
+      }
+      ss=tps,cp=tpcp;
+      show1();
+    }
+    else{
+      C[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1].innerText=ci;
+      a[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1]=ci;
+      v[ci]=1;
+      cal();
+      for(let i=1;i<=n;i++){
+        if(r[i][ci]<0) --p[i];
+      }
+      ss=tps,cp=tpcp;
+      show1();
+    }
+    
+    maxi=-1,op=0;
+    for(let i=1;i<=m*c;i++){
+      P[i].style.color="#000000";
+      if(v[i]==1) {
+        P[i].innerText="/";
+        continue;
+      }
+      if(p[i]>maxi) maxi=p[i],op=i;
+   	  P[i].innerText=p[i];
+    }
+    P[op].style.color="#FF0000";
+    
+    ccp=1010,css=-1,ci=0;
+    for(let i=1;i<=m*c;i++){
+      CPP[i].style.color="#000000";
+      CPS[i].style.color="#000000";
+      if(v[i]==1){
+        CPP[i].innerText="/";
+        CPS[i].innerText="/";
+        continue;
+      }
+      a[Math.floor((round)/c)+1][Math.floor((round)%c)+1]=i;
+      cal();
+      CPP[i].innerText=tpcp;
+      CPS[i].innerText=tps;
+      if(tpcp<ccp||(tpcp==ccp&&tps>css)) ccp=tpcp,css=tps,ci=i;
+   	  
+    }
+    CPP[ci].style.color="#0000FF";
+    CPS[ci].style.color="#0000FF";
+  }
+  
+  prev.onclick=function(){
+    if(round<=0) {
+      alert("All seats empty!");
+      return;
+    }
+    C[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1].innerText="";
+    let tp=a[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1];
+    for(let i=1;i<=n;i++){
+        if(r[i][tp]<0) ++p[i];
+     }
+    v[tp]=0;
+    a[Math.floor((round-1)/c)+1][Math.floor((round-1)%c)+1]=0;
+    cal();
+    ss=tps,cp=tpcp;
+    show1();
+    --round;
+   
+    maxi=-1,op=0;
+    for(let i=1;i<=m*c;i++){
+      P[i].style.color="#000000";
+      if(v[i]==1) {
+        P[i].innerText="/";
+        continue;
+      }
+      if(p[i]>maxi) maxi=p[i],op=i;
+   	  P[i].innerText=p[i];
+    }
+    P[op].style.color="#FF0000";
+    
+    ccp=1010,css=-1,ci=0;
+    for(let i=1;i<=m*c;i++){
+      CPP[i].style.color="#000000";
+      CPS[i].style.color="#000000";
+      if(v[i]==1){
+        CPP[i].innerText="/";
+        CPS[i].innerText="/";
+        continue;
+      }
+      a[Math.floor((round)/c)+1][Math.floor((round)%c)+1]=i;
+      cal();
+      CPP[i].innerText=tpcp;
+      CPS[i].innerText=tps;
+      if(tpcp<ccp||(tpcp==ccp&&tps>css)) ccp=tpcp,css=tps,ci=i;
+   	  
+    }
+    CPP[ci].style.color="#0000FF";
+    CPS[ci].style.color="#0000FF";
+  }
+
+  function cal(){
+    tps=0,tpcp=0;
+	for(let i=1;i<=m;i++){
+		for(let j=1;j<=c;j++){
+			for(let k=j+1;k<=c;k++){
+				if(r[a[i][j]][a[i][k]]<0) ++tpcp;
+				else if((k-j+c-1)%c==0||(k-j+1)%c==0) tps+=wn*r[a[i][j]][a[i][k]];
+				else tps+=wc*r[a[i][j]][a[i][k]];
+			}
+		}
+	}
+  }
+</script>
+</body>
+</html>
